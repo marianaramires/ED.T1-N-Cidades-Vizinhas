@@ -26,6 +26,29 @@ typedef struct _municipio
     char fuso_horario[40];
 } tmunicipio;
 
+char* trata(char *string){
+    char *pt = strstr(string, ":");
+    pt=pt+2;
+    char *virgula = strchr(pt, ',');
+    if(virgula)
+        *virgula = '\0';
+
+    return pt;
+}
+
+void trata_aspas(char *string, char *sem_aspas){
+    char aspas[500];
+    int j=0;
+    strcpy(aspas, trata(string));
+    for (int i = 0; aspas[i]!='\0'; i++)
+    {
+        if(aspas[i] != '"'){
+            sem_aspas[j++]=aspas[i];
+        }
+    }
+    sem_aspas[j]='\0';
+}
+
 uint32_t hashf(const char *str, uint32_t h)
 {
     /* One-byte-at-a-time Murmur hash
@@ -131,20 +154,10 @@ void hash_apaga(thash *h)
     free(h->table);
 }
 
-char* trata(char *string){
-    char *pt = strstr(string, ":");
-    pt=pt+2;
-    char *virgula = strchr(pt, ',');
-    *virgula = '\0';
-
-    return pt;
-}
-
 int main()
 {
     char c[500];
-    char t;
-    int i=0;
+    char sem_aspas[500];
     FILE *arq;
     arq = fopen("municipios.json", "r");
     tmunicipio teste;
@@ -161,13 +174,45 @@ int main()
 
         // nome
         fgets(c, 500, arq); 
-        strcpy(teste.nome, trata(c));
+        trata_aspas(c,sem_aspas);
+        strcpy(teste.nome, sem_aspas);
         printf("%s\n", teste.nome);
 
         // latitude
         fgets(c, 500, arq); 
         teste.latitude = atof(trata(c));
         printf("%f\n", teste.latitude);
+
+        // longitude
+        fgets(c, 500, arq); 
+        teste.longitude = atof(trata(c));
+        printf("%f\n", teste.longitude);
+        
+        // capital
+        fgets(c, 500, arq); 
+        teste.capital = atoi(trata(c));
+        printf("%d\n", teste.capital);
+
+        // codigo_uf
+        fgets(c, 500, arq); 
+        teste.codigo_uf = atoi(trata(c));
+        printf("%d\n", teste.codigo_uf);
+
+        // siafi_id
+        fgets(c, 500, arq); 
+        teste.siafi_id = atoi(trata(c));
+        printf("%d\n", teste.siafi_id);
+
+        // ddd
+        fgets(c, 500, arq); 
+        teste.ddd = atoi(trata(c));
+        printf("%d\n", teste.ddd);
+
+        // fuso horario
+        fgets(c, 500, arq); 
+        trata_aspas(c,sem_aspas);
+        strcpy(teste.fuso_horario, sem_aspas);
+        printf("%s\n", teste.fuso_horario);
 
         fgets(c, 100, arq); // lixo
     //}
