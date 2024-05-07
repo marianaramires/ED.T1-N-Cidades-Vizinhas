@@ -4,15 +4,6 @@
 #include <string.h>
 #define SEED 0x12345678
 
-typedef struct
-{
-    uintptr_t *table;
-    int size;
-    int max;
-    uintptr_t deleted;
-    char *(*get_key)(void *);
-} thash;
-
 typedef struct _municipio
 {
     char codigo_ibge[10];
@@ -25,6 +16,13 @@ typedef struct _municipio
     int ddd;
     char fuso_horario[40];
 } tmunicipio;
+
+typedef struct
+{
+    tmunicipio *table;
+    int size;
+    int max;
+} thash;
 
 char* trata(char *string){
     char *pt = strstr(string, ":");
@@ -62,162 +60,88 @@ uint32_t hashf(const char *str, uint32_t h)
     return h;
 }
 
-int hash_insere(thash *h, void *bucket)
+int hash_constroi(thash *h)
 {
-    uint32_t hash = hashf(h->get_key(bucket), SEED);
-    int pos = hash % (h->max);
-    /*se esta cheio*/
-    if (h->max == (h->size + 1))
-    {
-        free(bucket);
-        return EXIT_FAILURE;
-    }
-    else
-    { /*fazer a insercao*/
-        while (h->table[pos] != 0)
-        {
-            if (h->table[pos] == h->deleted)
-                break;
-            pos = (pos + 1) % h->max;
-        }
-        h->table[pos] = (uintptr_t)bucket;
-        h->size += 1;
-    }
-    return EXIT_SUCCESS;
-}
-
-int hash_constroi(thash *h, int nbuckets, char *(*get_key)(void *))
-{
-    h->table = calloc(sizeof(void *), nbuckets + 1);
+    // 11003 por ser quase o dobro da qtnde de elementos e ser numero primo
+    h->table = calloc(sizeof(void *), 11003);
     if (h->table == NULL)
     {
         return EXIT_FAILURE;
     }
-    h->max = nbuckets + 1;
+    h->max = 11003;
     h->size = 0;
-    h->deleted = (uintptr_t) & (h->size);
-    h->get_key = get_key;
     return EXIT_SUCCESS;
-}
-
-void *hash_busca(thash h, const char *key)
-{
-    int pos = hashf(key, SEED) % (h.max);
-    void *ret = NULL;
-    while (h.table[pos] != 0 && ret == NULL)
-    {
-        if (strcmp(h.get_key((void *)h.table[pos]), key) == 0)
-        {
-            ret = (void *)h.table[pos];
-        }
-        else
-        {
-            pos = (pos + 1) % h.max;
-        }
-    }
-    return ret;
-}
-
-int hash_remove(thash *h, const char *key)
-{
-    int pos = hashf(key, SEED) % (h->max);
-    while (h->table[pos] != 0)
-    {
-        if (strcmp(h->get_key((void *)h->table[pos]), key) == 0)
-        { /* se achei remove*/
-            free((void *)h->table[pos]);
-            h->table[pos] = h->deleted;
-            h->size -= 1;
-            return EXIT_SUCCESS;
-        }
-        else
-        {
-            pos = (pos + 1) % h->max;
-        }
-    }
-    return EXIT_FAILURE;
-}
-
-void hash_apaga(thash *h)
-{
-    int pos;
-    for (pos = 0; pos < h->max; pos++)
-    {
-        if (h->table[pos] != 0)
-        {
-            if (h->table[pos] != h->deleted)
-            {
-                free((void *)h->table[pos]);
-            }
-        }
-    }
-    free(h->table);
 }
 
 int main()
 {
+    thash h;
+    hash_constroi(&h);
     char c[500];
     char sem_aspas[500];
+    long int cont=0;
     FILE *arq;
     arq = fopen("municipios.json", "r");
-    tmunicipio teste;
 
     fgets(c, 100, arq); // lixo
-    //while (!feof(arq))
-    //{
+    while (!feof(arq))
+    {
         fgets(c, 100, arq); // lixo
 
         // codigo_ibge
         fgets(c, 500, arq); 
-        strcpy(teste.codigo_ibge, trata(c));
-        printf("%s\n", teste.codigo_ibge);
+        strcpy(h.table[0].codigo_ibge, trata(c));
+        printf("%s\n", h.table[0].codigo_ibge);
 
         // nome
         fgets(c, 500, arq); 
         trata_aspas(c,sem_aspas);
-        strcpy(teste.nome, sem_aspas);
-        printf("%s\n", teste.nome);
+        strcpy(h.table[0].nome, sem_aspas);
+        printf("%s\n", h.table[0].nome);
 
         // latitude
         fgets(c, 500, arq); 
-        teste.latitude = atof(trata(c));
-        printf("%f\n", teste.latitude);
+        h.table[0].latitude = atof(trata(c));
+        printf("%f\n", h.table[0].latitude);
 
         // longitude
         fgets(c, 500, arq); 
-        teste.longitude = atof(trata(c));
-        printf("%f\n", teste.longitude);
+        h.table[0].longitude = atof(trata(c));
+        printf("%f\n", h.table[0].longitude);
         
         // capital
         fgets(c, 500, arq); 
-        teste.capital = atoi(trata(c));
-        printf("%d\n", teste.capital);
+        h.table[0].capital = atoi(trata(c));
+        printf("%d\n", h.table[0].capital);
 
         // codigo_uf
         fgets(c, 500, arq); 
-        teste.codigo_uf = atoi(trata(c));
-        printf("%d\n", teste.codigo_uf);
+        h.table[0].codigo_uf = atoi(trata(c));
+        printf("%d\n", h.table[0].codigo_uf);
 
         // siafi_id
         fgets(c, 500, arq); 
-        teste.siafi_id = atoi(trata(c));
-        printf("%d\n", teste.siafi_id);
+        h.table[0].siafi_id = atoi(trata(c));
+        printf("%d\n", h.table[0].siafi_id);
 
         // ddd
         fgets(c, 500, arq); 
-        teste.ddd = atoi(trata(c));
-        printf("%d\n", teste.ddd);
+        h.table[0].ddd = atoi(trata(c));
+        printf("%d\n", h.table[0].ddd);
 
         // fuso horario
         fgets(c, 500, arq); 
         trata_aspas(c,sem_aspas);
-        strcpy(teste.fuso_horario, sem_aspas);
-        printf("%s\n", teste.fuso_horario);
+        strcpy(h.table[0].fuso_horario, sem_aspas);
+        printf("%s\n", h.table[0].fuso_horario);
 
         fgets(c, 100, arq); // lixo
-    //}
+        cont++;
+        printf("Oi");
+        printf("%d\n", cont);
+    }
 
     fclose(arq);
-
+    free(h.table);
     return EXIT_SUCCESS;
 }
