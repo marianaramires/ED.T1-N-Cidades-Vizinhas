@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
-#include<assert.h>
+#include <assert.h>
 #define SEED 0x12345678
 
 typedef struct _municipio
@@ -20,19 +20,21 @@ typedef struct _municipio
 
 typedef struct
 {
-    uintptr_t * table;
+    uintptr_t *table;
     int size;
     int max;
-    char * (*get_key)(void *);
+    char *(*get_key)(void *);
     uintptr_t deleted;
 } thash;
 
-char * get_key(void * reg){
+char *get_key(void *reg)
+{
     return (*((tmunicipio *)reg)).codigo_ibge;
 }
 
-void aloca_municipio(tmunicipio **municipio,char * codigo_ibge, char * nome, float latitude, float longitude,
-    int capital, int codigo_uf, int siafi_id, int ddd, char * fuso_horario){
+void aloca_municipio(tmunicipio **municipio, char *codigo_ibge, char *nome, float latitude, float longitude,
+                     int capital, int codigo_uf, int siafi_id, int ddd, char *fuso_horario)
+{
 
     strcpy((*municipio)->codigo_ibge, codigo_ibge);
     strcpy((*municipio)->nome, nome);
@@ -45,27 +47,30 @@ void aloca_municipio(tmunicipio **municipio,char * codigo_ibge, char * nome, flo
     strcpy((*municipio)->fuso_horario, fuso_horario);
 }
 
-char* trata(char *string){
+char *trata(char *string)
+{
     char *pt = strstr(string, ":");
-    pt=pt+2;
+    pt = pt + 2;
     char *virgula = strchr(pt, ',');
-    if(virgula)
+    if (virgula)
         *virgula = '\0';
 
     return pt;
 }
 
-void trata_aspas(char *string, char *sem_aspas){
+void trata_aspas(char *string, char *sem_aspas)
+{
     char aspas[500];
-    int j=0;
+    int j = 0;
     strcpy(aspas, trata(string));
-    for (int i = 0; aspas[i]!='\0'; i++)
+    for (int i = 0; aspas[i] != '\0'; i++)
     {
-        if(aspas[i] != '"'){
-            sem_aspas[j++]=aspas[i];
+        if (aspas[i] != '"')
+        {
+            sem_aspas[j++] = aspas[i];
         }
     }
-    sem_aspas[j]='\0';
+    sem_aspas[j] = '\0';
 }
 
 uint32_t hashf(const char *str, uint32_t h)
@@ -81,28 +86,34 @@ uint32_t hashf(const char *str, uint32_t h)
     return h;
 }
 
-uint32_t hash_duplo(uint32_t h, int max, int i){
-    int hash = h + (i * ((h % (max-1))+1));
+uint32_t hash_duplo(uint32_t h, int max, int i)
+{
+    int hash = h + (i * ((h % (max - 1)) + 1));
     return hash;
 }
 
-int hash_insere(thash * h, void * bucket){
-    uint32_t hash = hashf(h->get_key(bucket),SEED);
-    int pos = hash %(h->max);
+int hash_insere(thash *h, void *bucket)
+{
+    uint32_t hash = hashf(h->get_key(bucket), SEED);
+    int pos = hash % (h->max);
     int i = 0;
     // verifica se a tabela esta cheia
-    if (h->max == (h->size+1)){
+    if (h->max == (h->size + 1))
+    {
         free(bucket);
         return EXIT_FAILURE;
-    }else{ // faz a insercao
-        while(h->table[pos] != 0){
+    }
+    else
+    { // faz a insercao
+        while (h->table[pos] != 0)
+        {
             i++;
             if (h->table[pos] == h->deleted)
                 break;
             pos = hash_duplo(hash, h->max, i);
         }
         h->table[pos] = (uintptr_t)bucket;
-        h->size +=1;
+        h->size += 1;
     }
     return EXIT_SUCCESS;
 }
@@ -118,8 +129,43 @@ int hash_constroi(thash *h)
     h->max = 11003;
     h->size = 0;
     h->get_key = get_key;
-    h->deleted = (uintptr_t)&(h->size);
+    h->deleted = (uintptr_t) & (h->size);
     return EXIT_SUCCESS;
+}
+
+void *hash_busca(thash h, const char *key)
+{
+    uint32_t hash = hashf(key, SEED);
+    int pos = hash % (h.max);
+    int i = 0;
+    void *ret = NULL;
+    while (h.table[pos] != 0 && ret == NULL)
+    {
+        if (strcmp(h.get_key((void *)h.table[pos]), key) == 0)
+        {
+            ret = (void *)h.table[pos];
+        }
+        else
+        {
+            i++;
+            pos = hash_duplo(hash, h.max, i);
+        }
+    }
+    return ret;
+}
+
+void municipio_printa(tmunicipio municipio)
+{
+    printf("----- CIDADE -----\n");
+    printf("Código IBGE: %s\n", municipio.codigo_ibge);
+    printf("Nome: %s\n", municipio.nome);
+    printf("Latitude: %f\n", municipio.latitude);
+    printf("Longitude: %f\n", municipio.longitude);
+    printf("Capital: %d\n", municipio.capital);
+    printf("Código UF: %d\n", municipio.codigo_uf);
+    printf("ID SIAFI: %d\n", municipio.siafi_id);
+    printf("DDD: %d\n", municipio.ddd);
+    printf("Fuso Horário: %s\n", municipio.fuso_horario);
 }
 
 int main()
@@ -128,7 +174,7 @@ int main()
     hash_constroi(&h);
     char c[500];
     char sem_aspas[500];
-    long int cont=0;
+    long int cont = 0;
     char codigo_ibge[10];
     char nome[40];
     float latitude;
@@ -142,67 +188,67 @@ int main()
     arq = fopen("municipios.json", "r");
 
     fgets(c, 100, arq); // lixo
-    //while (!feof(arq))
+                        // while (!feof(arq))
     //{
-        fgets(c, 100, arq); // lixo
+    fgets(c, 100, arq); // lixo
 
-        // codigo_ibge
-        fgets(c, 500, arq); 
-        strcpy(codigo_ibge, trata(c));
+    // codigo_ibge
+    fgets(c, 500, arq);
+    strcpy(codigo_ibge, trata(c));
 
-        // nome
-        fgets(c, 500, arq); 
-        trata_aspas(c,sem_aspas);
-        strcpy(nome, sem_aspas);
+    // nome
+    fgets(c, 500, arq);
+    trata_aspas(c, sem_aspas);
+    strcpy(nome, sem_aspas);
 
-        // latitude
-        fgets(c, 500, arq); 
-        latitude = atof(trata(c));
+    // latitude
+    fgets(c, 500, arq);
+    latitude = atof(trata(c));
 
-        // longitude
-        fgets(c, 500, arq); 
-        longitude = atof(trata(c));
-        
-        // capital
-        fgets(c, 500, arq); 
-        capital = atoi(trata(c));
+    // longitude
+    fgets(c, 500, arq);
+    longitude = atof(trata(c));
 
-        // codigo_uf
-        fgets(c, 500, arq); 
-        codigo_uf = atoi(trata(c));
+    // capital
+    fgets(c, 500, arq);
+    capital = atoi(trata(c));
 
-        // siafi_id
-        fgets(c, 500, arq); 
-        siafi_id = atoi(trata(c));
+    // codigo_uf
+    fgets(c, 500, arq);
+    codigo_uf = atoi(trata(c));
 
-        // ddd
-        fgets(c, 500, arq); 
-        ddd = atoi(trata(c));
+    // siafi_id
+    fgets(c, 500, arq);
+    siafi_id = atoi(trata(c));
 
-        // fuso horario
-        fgets(c, 500, arq); 
-        trata_aspas(c,sem_aspas);
-        strcpy(fuso_horario, sem_aspas);
+    // ddd
+    fgets(c, 500, arq);
+    ddd = atoi(trata(c));
 
-        fgets(c, 100, arq); // lixo
+    // fuso horario
+    fgets(c, 500, arq);
+    trata_aspas(c, sem_aspas);
+    strcpy(fuso_horario, sem_aspas);
+
+    fgets(c, 100, arq); // lixo
     //}
 
-    tmunicipio * temp = malloc(sizeof(tmunicipio));
-    aloca_municipio(&temp, codigo_ibge, nome, latitude, longitude, capital, 
-    codigo_uf, siafi_id, ddd, fuso_horario);
+    tmunicipio *temp = malloc(sizeof(tmunicipio));
+    aloca_municipio(&temp, codigo_ibge, nome, latitude, longitude, capital,
+                    codigo_uf, siafi_id, ddd, fuso_horario);
 
-    printf("%s\n", temp->codigo_ibge);
-    printf("%s\n", temp->nome);
-    printf("%f\n", temp->latitude);
-    printf("%f\n", temp->longitude);
-    printf("%d\n", temp->capital);
-    printf("%d\n", temp->codigo_uf);
-    printf("%d\n", temp->siafi_id);
-    printf("%d\n", temp->ddd);
-    printf("%s\n", temp->fuso_horario);
+    assert(hash_insere(&h, temp) == EXIT_SUCCESS);
 
-    assert(hash_insere(&h, temp)==EXIT_SUCCESS);
-    
+    tmunicipio *search = hash_busca(h, "5200050");
+    if (search != NULL)
+    {
+        municipio_printa(*search);
+    }
+    else
+    {
+        printf("Não encontrado.");
+    }
+
     fclose(arq);
     free(h.table);
     return EXIT_SUCCESS;
