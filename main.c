@@ -9,7 +9,10 @@
 int main()
 {
     thash h;
-    hash_constroi(&h, 11003, get_key);
+    hash_constroi(&h, 11003, get_cod);
+
+    thash h_nome;
+    hash_constroi(&h_nome, 11003, get_nome);
 
     char c[500];
     char sem_aspas[500];
@@ -81,23 +84,25 @@ int main()
 
         hash_insere(&h, aloca_municipio(codigo_ibge, nome, latitude, longitude, capital,
                                         codigo_uf, siafi_id, ddd, fuso_horario));
+        hash_insere(&h_nome, aloca_municipio(codigo_ibge, nome, latitude, longitude, capital,
+                                             codigo_uf, siafi_id, ddd, fuso_horario));
         kd_insere(&arv, aloca_municipio(codigo_ibge, nome, latitude, longitude, capital,
                                         codigo_uf, siafi_id, ddd, fuso_horario));
     }
 
     while (condicao != 0)
     {
-        printf("-----\n");
+        printf("___________________________________________________________________________\n");
         printf("1 - Consulte uma cidade pelo seu codigo IBGE\n");
         printf("2 - Consulte os N vizinhos mais proximos de uma cidade pelo seu codigo IBGE\n");
-        printf("3 - Consulte os N vizinhos mais próximos de uma cidade pelo seu nome \n");
+        printf("3 - Consulte os N vizinhos mais proximos de uma cidade pelo seu nome \n");
         printf("0 - Sair\n");
         scanf("%d", &condicao);
 
         switch (condicao)
         {
         case 1:
-            printf("Digite o código IBGE da cidade: ");
+            printf("\nDigite o codigo IBGE da cidade: ");
             scanf("%s", busca);
 
             tmunicipio *search = hash_busca(h, busca);
@@ -111,22 +116,48 @@ int main()
             }
             break;
         case 2:
-            printf("Digite o codigo IBGE da cidade\n");
+            printf("\nDigite o codigo IBGE da cidade: ");
             scanf("%s", busca);
 
             theap heap;
-            printf("Digite quantos vizinhos deseja buscar\n");
+            printf("Digite quantos vizinhos deseja buscar: ");
             scanf("%d", &vizinhos);
             heap_constroi(&heap, vizinhos);
 
-            printf("Oi\n");
             kd_busca(h, &arv, busca, &heap);
-            printf("depois de busca\n");
             heapsort(&heap);
             heap_print(heap);
             break;
         case 3:
-            printf("TO-DO");
+            printf("\nDigite o nome da cidade: ");
+            scanf(" %[^\n]s", busca);
+            int j = 0;
+
+            tmunicipio *search_nome = hash_busca_nome(h_nome, busca, &j);
+            if (search_nome != NULL)
+            {
+                if (j > 1)
+                {
+                    printf("Mais de uma cidade encontrada. Digite o codigo IBGE da cidade desejada: ");
+                    scanf("%s", busca);
+
+                    search_nome = hash_busca(h, busca);
+                }
+
+                theap heap;
+                printf("Digite quantos vizinhos deseja buscar: ");
+                scanf("%d", &vizinhos);
+                heap_constroi(&heap, vizinhos);
+
+                kd_busca(h, &arv, search_nome->codigo_ibge, &heap);
+                heapsort(&heap);
+                heap_print(heap);
+                
+            }
+            else
+            {
+                printf("Cidade não encontrada.");
+            }
             break;
         case 0:
             break;
@@ -138,5 +169,6 @@ int main()
 
     fclose(arq);
     free(h.table);
+    free(h_nome.table);
     return EXIT_SUCCESS;
 }
