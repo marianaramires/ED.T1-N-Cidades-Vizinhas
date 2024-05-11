@@ -34,6 +34,8 @@ int main()
     tarv arv;
     kd_constroi(&arv, cmp);
 
+    theap heap;
+
     fgets(c, 100, arq); // lixo
     while (!feof(arq))
     {
@@ -119,7 +121,6 @@ int main()
             printf("\nDigite o codigo IBGE da cidade: ");
             scanf("%s", busca);
 
-            theap heap;
             printf("Digite quantos vizinhos deseja buscar: ");
             scanf("%d", &vizinhos);
             heap_constroi(&heap, vizinhos);
@@ -144,7 +145,6 @@ int main()
                     search_nome = hash_busca(h, busca);
                 }
 
-                theap heap;
                 printf("Digite quantos vizinhos deseja buscar: ");
                 scanf("%d", &vizinhos);
                 heap_constroi(&heap, vizinhos);
@@ -152,7 +152,6 @@ int main()
                 kd_busca(h, &arv, search_nome->codigo_ibge, &heap);
                 heapsort(&heap);
                 heap_print(heap);
-                
             }
             else
             {

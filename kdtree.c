@@ -227,3 +227,16 @@ void heap_print(theap heap){
     }
     
 }
+
+void heap_destroi(theap * heap){
+    if(heap == NULL){
+        return;
+    }
+
+    if(heap->cidades != NULL){
+        free(heap->cidades);
+        heap->cidades = NULL;
+    }
+
+    free(heap);
+}
