@@ -158,16 +158,14 @@ void *hash_busca(thash h, const char *key)
 
 void municipio_printa(tmunicipio municipio)
 {
-    printf("----- CIDADE -----\n");
-    printf("Código IBGE: %s\n", municipio.codigo_ibge);
-    printf("Nome: %s\n", municipio.nome);
-    printf("Latitude: %f\n", municipio.latitude);
-    printf("Longitude: %f\n", municipio.longitude);
-    printf("Capital: %d\n", municipio.capital);
-    printf("Código UF: %d\n", municipio.codigo_uf);
-    printf("ID SIAFI: %d\n", municipio.siafi_id);
-    printf("DDD: %d\n", municipio.ddd);
-    printf("Fuso Horário: %s\n", municipio.fuso_horario);
+    printf("%-12s | %-30s | %-10s | %-10s | %-6s | %-3s | %-5s | %-3s | %-3s\n",
+    "Codigo IBGE", "Nome", "Latitude", "Longitude",
+    "Capital", "Codigo UF", "ID SIAFI", "DDD", "Fuso Horario");
+    
+    printf("%-12s | %-30s | %-10f | %-10f | %-6d | %-3d | %-5d | %-3d | %-3s\n",
+           municipio.codigo_ibge, municipio.nome, municipio.latitude,
+           municipio.longitude, municipio.capital, municipio.codigo_uf,
+           municipio.siafi_id, municipio.ddd, municipio.fuso_horario);
 }
 
 // int main()
