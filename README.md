@@ -1,6 +1,6 @@
 # Trabalho 1 de Estrutura de Dados
 Estudante: Mariana Gonzaga Ramires  
-Professor: Edson Takashi Matsubara
+Professor: Edson Takashi Matsubara  
 2024.1
 
 ## Tarefa 1: (consulta cidade)
