@@ -1,5 +1,5 @@
 # Trabalho 1 de Estrutura de Dados
-Estudante: Mariana Gonzaga Ramires
+Estudante: Mariana Gonzaga Ramires  
 Professor: Edson Takashi Matsubara
 2024.1
 
