@@ -1,5 +1,13 @@
 {
     "files.associations": {
-        "string": "c"
+        "string": "c",
+        "lib.h": "c",
+        "math.h": "c",
+        "stdlib.h": "c",
+        "string.h": "c",
+        "hash.h": "c",
+        "json.h": "c",
+        "kdtree.h": "c",
+        "stdio.h": "c"
     }
 }

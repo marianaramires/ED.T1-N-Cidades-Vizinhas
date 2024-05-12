@@ -2,30 +2,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
-#include <assert.h>
+#include "../include/lib.h"
 #define SEED 0x12345678
-
-typedef struct _municipio
-{
-    char codigo_ibge[10];
-    char nome[40];
-    float latitude;
-    float longitude;
-    int capital;
-    int codigo_uf;
-    int siafi_id;
-    int ddd;
-    char fuso_horario[40];
-} tmunicipio;
-
-typedef struct
-{
-    uintptr_t *table;
-    int size;
-    int max;
-    char *(*get_key)(void *);
-    uintptr_t deleted;
-} thash;
 
 char *get_cod(void *reg)
 {
@@ -52,32 +30,6 @@ void *aloca_municipio(char *codigo_ibge, char *nome, float latitude, float longi
     strcpy(municipio->fuso_horario, fuso_horario);
 
     return municipio;
-}
-
-char *trata(char *string)
-{
-    char *pt = strstr(string, ":");
-    pt = pt + 2;
-    char *virgula = strchr(pt, ',');
-    if (virgula)
-        *virgula = '\0';
-
-    return pt;
-}
-
-void trata_aspas(char *string, char *sem_aspas)
-{
-    char aspas[500];
-    int j = 0;
-    strcpy(aspas, trata(string));
-    for (int i = 0; aspas[i] != '\0'; i++)
-    {
-        if (aspas[i] != '"')
-        {
-            sem_aspas[j++] = aspas[i];
-        }
-    }
-    sem_aspas[j] = '\0';
 }
 
 uint32_t hashf(const char *str, uint32_t h)
@@ -139,6 +91,18 @@ int hash_constroi(thash *h, int nbuckets, char *(*get_key)(void *))
     return EXIT_SUCCESS;
 }
 
+void municipio_printa(tmunicipio municipio)
+{
+    printf("%-12s | %-30s | %-10s | %-10s | %-6s | %-3s | %-5s | %-3s | %-3s\n",
+           "Codigo IBGE", "Nome", "Latitude", "Longitude",
+           "Capital", "Codigo UF", "ID SIAFI", "DDD", "Fuso Horario");
+
+    printf("%-12s | %-30s | %-10f | %-10f | %-6d | %-3d | %-5d | %-3d | %-3s\n",
+           municipio.codigo_ibge, municipio.nome, municipio.latitude,
+           municipio.longitude, municipio.capital, municipio.codigo_uf,
+           municipio.siafi_id, municipio.ddd, municipio.fuso_horario);
+}
+
 void *hash_busca(thash h, const char *key)
 {
     uint32_t hash = hashf(key, SEED);
@@ -155,18 +119,6 @@ void *hash_busca(thash h, const char *key)
         pos = hash_duplo(hash, h.max, i);
     }
     return ret;
-}
-
-void municipio_printa(tmunicipio municipio)
-{
-    printf("%-12s | %-30s | %-10s | %-10s | %-6s | %-3s | %-5s | %-3s | %-3s\n",
-           "Codigo IBGE", "Nome", "Latitude", "Longitude",
-           "Capital", "Codigo UF", "ID SIAFI", "DDD", "Fuso Horario");
-
-    printf("%-12s | %-30s | %-10f | %-10f | %-6d | %-3d | %-5d | %-3d | %-3s\n",
-           municipio.codigo_ibge, municipio.nome, municipio.latitude,
-           municipio.longitude, municipio.capital, municipio.codigo_uf,
-           municipio.siafi_id, municipio.ddd, municipio.fuso_horario);
 }
 
 void *hash_busca_nome(thash h, const char *key, int *cont)

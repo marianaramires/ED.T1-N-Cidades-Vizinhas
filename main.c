@@ -4,7 +4,7 @@
 #include <string.h>
 #include <assert.h>
 #include <math.h>
-#include "kdtree.c"
+#include "include/lib.h"
 
 int main()
 {
