@@ -77,7 +77,7 @@ typedef struct _tnode
     struct _tnode *dir;
 } tnode;
 
-typedef struct _abb
+typedef struct _kd
 {
     tnode *raiz;
     double (*cmp)(void *, void *, int);
