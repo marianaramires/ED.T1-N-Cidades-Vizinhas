@@ -117,3 +117,18 @@ void heap_print(theap heap)
                heap.cidades[i].municipio->siafi_id, heap.cidades[i].municipio->ddd, heap.cidades[i].municipio->fuso_horario);
     }
 }
+
+void heap_destroi(theap * heap){
+    if (heap == NULL) {
+        return;
+    }
+
+    // Libere a memória de cada elemento do vetor de cidades
+    for (int i = 0; i < heap->tam; i++) {
+        free(heap->cidades[i].municipio);
+        heap->cidades[i].dist = 0;
+    }
+
+    free(heap->cidades);
+    free(heap);
+}

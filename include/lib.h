@@ -68,6 +68,7 @@ double heap_acessa_max(theap heap);
 void heap_constroi(theap *heap, int max);
 void heapsort(theap *heap);
 void heap_print(theap heap);
+void heap_destroi(theap * heap);
 
 /* KDTREE */
 typedef struct _tnode
