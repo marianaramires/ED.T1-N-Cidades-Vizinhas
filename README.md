@@ -15,9 +15,3 @@ Descrição: Para a busca pela vizinhança construa uma kdtree utilizando uma AB
 ## Tarefa 3 (combinar tarefa 1 e 2).
 Objetivo: Dado o nome de uma cidade retornar todas as informações das N cidades vizinhas mais próximas. 
 Descrição: Crie uma outra tabela hash que dado o nome da cidade retorne o codigo_ibge. De posse do codigo_ibge utilize o código da tarefa 2 para retornar os vizinhos mais próximos e o código da tarefa 1 para retornar as informações das cidades vizinhas. Cidades com nomes iguais vocês devem retornar a lista de nomes e deixar o usuário escolher a cidade desejada.
-
-### Instruções de compilação:
-Windows:
-gcc -pedantic -g -o main.exe ./src/hash.c ./src/heap.c ./src/json.c ./src/kdtree.c ./main.c
-Linux:
-gcc -Wall -pedantic -g -o ./main.exe ./src/hash.c ./src/heap.c ./src/json.c ./src/kdtree.c ./main.c -lm
